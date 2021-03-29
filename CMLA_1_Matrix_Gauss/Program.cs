@@ -99,7 +99,7 @@ namespace CMLA_1_Matrix_Gauss
             ProcessFunctionOverData((i, j) =>
             {
                 Console.Write($"data[{i + 1}][{j + 1}] = ");
-                data[i, j] = Int32.Parse(Console.ReadLine());
+                data[i, j] = Double.Parse(Console.ReadLine());
             });
         }
 
@@ -271,7 +271,7 @@ namespace CMLA_1_Matrix_Gauss
                 U[i, i] = Math.Sqrt(A[i, i] - SumK);
 
                 if (U[i, i] == 0)
-                    throw new Exception("Diagonal matrix Elem is 0");
+                    throw new Exception("Diagonal element is 0");
                 for (int j = i+1; j < n; j++)
                 {
                     SumK = 0;
@@ -355,11 +355,13 @@ namespace CMLA_1_Matrix_Gauss
                 Console.WriteLine("\nx :");
                 x.OutputMatrix();
 
-                
+                Console.WriteLine("\nU :");
+                U.OutputMatrix();
+
                 double detA = 0;
                 for (int i = 0; i < n; i++)
                 {
-                    detA += U[i, i];
+                    detA *= U[i, i];
                 }
                 Console.WriteLine($"\ndet(A) = det(U)^2 = {Math.Pow(detA,2.0F)}");
 
