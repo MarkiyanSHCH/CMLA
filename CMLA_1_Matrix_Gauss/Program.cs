@@ -389,6 +389,7 @@ namespace CMLA_1_Matrix_Gauss
 
             Console.ReadKey();
 
+
         }
     }
     
