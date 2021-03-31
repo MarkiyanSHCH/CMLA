@@ -358,7 +358,7 @@ namespace CMLA_1_Matrix_Gauss
                 Console.WriteLine("\nU :");
                 U.OutputMatrix();
 
-                double detA = 0;
+                double detA = 1;
                 for (int i = 0; i < n; i++)
                 {
                     detA *= U[i, i];
