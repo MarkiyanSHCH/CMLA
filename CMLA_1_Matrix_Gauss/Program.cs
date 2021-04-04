@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CMLA_1_Matrix_Gauss
 {
@@ -110,9 +111,16 @@ namespace CMLA_1_Matrix_Gauss
             });
         }
 
+        public void OutputVector()
+        {
+            ProcessFunctionOverData((i, j) => {
+                Console.Write(data[i, j] + " ");
+            });
+        }
+
         public void Round()
         {
-            ProcessFunctionOutput((i, j) => {
+            ProcessFunctionOverData((i, j) => {
                 data[i, j] = Math.Round(data[i, j], 3);
                 Console.Write(data[i, j] + " ");
             });
@@ -307,6 +315,80 @@ namespace CMLA_1_Matrix_Gauss
             
         }
 
+        static Matrix TMA(Matrix A, Matrix B, Matrix C, Matrix F, int n)
+        {
+            Matrix y = new Matrix(n, 1);
+            double[] alpha = new double[n-1];
+            double[] beta = new double[n-1];
+         
+
+            alpha[0] =(-B[0,0]) / C[0,0];   
+            beta[0] = F[0,0] / C[0,0];  
+            for (int i = 0; i < n-2; i++)
+            {
+                double id = (C[i+1,0] + (alpha[i] * A[i,0]));  
+                alpha[i+1] = (-B[i+1,0])/id;                     
+                beta[i+1] = (F[i+1,0] - (beta[i] * A[i,0])) /id;
+            }
+
+       
+            y[n - 1, 0] = (F[n-1, 0] - (beta[n-2] * A[n-2, 0])) / (C[n-1, 0] + (alpha[n-2] * A[n-2, 0]));
+            for (int i = n - 2; i >= 0; i--)
+                y[i,0] = beta[i] + (alpha[i] * y[i + 1,0]);
+
+            return y;
+        }
+
+        static void FillAllVector(Matrix A, Matrix B, Matrix C, Matrix F, int n)
+        {
+            double h = 1.0 / (n-1);
+            
+            A[n - 2,0] = 0;
+            B[0, 0] = 0;
+            C[0, 0] = 1;
+            C[n - 1, 0] = 1;
+            F[0, 0] = 1;
+            F[n - 1, 0] = 3;
+            for (int i = 0; i < n; i++)
+            {
+                if(i < n - 2)
+                {
+                    A[i, 0] = 1;
+                }
+                if( i >= 1 && i < n - 1)
+                {
+                    B[i, 0] = 1;
+                }
+                if(i >= 1 && i < n - 1)
+                {
+                    C[i, 0] = -2 - (1 + i * h) * Math.Pow(h, 2);
+                    F[i, 0] = (4 - (1 + i * h) * (2* Math.Pow(i, 2)*Math.Pow(h, 2)+1)) * Math.Pow(h, 2);
+                }       
+
+            }
+           
+        }
+
+        static void Norma(Matrix y, int n)
+        {
+            double h =  1.0 / (n-1);
+            Matrix yS = new Matrix(n, 1);
+            for (int i = 0; i < n; i++)
+            {
+                yS[i, 0] = (2 * Math.Pow(i, 2) * Math.Pow(h, 2)) + 1;
+            }
+
+            double[] final = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                final[i] = Math.Abs(y[i, 0] - yS[i, 0]);
+            
+            }
+
+            Console.WriteLine($"\n||y - y*|| = {final.Max()}");
+        }
+
+
         static void Main(string[] args)
         {
             //Console.WriteLine("Input n: ");
@@ -337,55 +419,138 @@ namespace CMLA_1_Matrix_Gauss
 
             //}
 
+            //Console.WriteLine("Input n: ");
+            //int n = Int32.Parse(Console.ReadLine());
+            //Matrix A = new Matrix(n, n);
+            //Console.WriteLine("\nEnter A Elem:");
+            //A.InputElem();
+            //if (A.IsSymmetric())
+            //{
+            //    Matrix U = new Matrix(n, n);
+            //    Matrix b = new Matrix(n, 1);
+            //    Console.WriteLine("\nEnter b Elem:");
+            //    b.InputElem();
+            //    Matrix x = new Matrix(n, 1);
+
+            //    x = UU(A, U, 3, b);
+
+            //    Console.WriteLine("\nx :");
+            //    x.OutputMatrix();
+
+            //    Console.WriteLine("\nU :");
+            //    U.OutputMatrix();
+
+            //    double detA = 1;
+            //    for (int i = 0; i < n; i++)
+            //    {
+            //        detA *= U[i, i];
+            //    }
+            //    Console.WriteLine($"\ndet(A) = det(U)^2 = {Math.Pow(detA,2.0F)}");
+
+            //    Console.WriteLine("\nU^t * U :");
+            //    Matrix tmpU = U.Transpose() * U;
+            //    tmpU.OutputMatrix();
+
+            //    Console.WriteLine("\nA :");
+            //    A.OutputMatrix();
+
+            //    Console.WriteLine("\nA * x :");
+            //    Matrix tmp = A * x;
+            //    tmp.OutputMatrix();
+
+            //    Console.WriteLine("\nb :");
+            //    b.OutputMatrix();
+
+            //    Console.ReadKey();
+            //}
+            //else
+            //{
+            //    throw new Exception("Matrix not symmetric");
+            //}
             Console.WriteLine("Input n: ");
             int n = Int32.Parse(Console.ReadLine());
-            Matrix A = new Matrix(n, n);
-            Console.WriteLine("\nEnter A Elem:");
-            A.InputElem();
-            if (A.IsSymmetric())
+            Matrix A = new Matrix(n-1, 1);
+            Matrix B = new Matrix(n-1, 1);
+            Matrix C = new Matrix(n, 1);
+            Matrix F = new Matrix(n, 1);
+
+            //Console.WriteLine("\nB :");
+            //B.InputElem();
+            //Console.WriteLine("\nC :");
+            //C.InputElem();
+            //Console.WriteLine("\nA :");
+            //A.InputElem();
+            //Console.WriteLine("\nF :");
+            //F.InputElem();
+
+            FillAllVector(A, B, C, F, n);
+            if (!(Math.Abs(C[0, 0]) >= Math.Abs(B[0, 0])))
             {
-                Matrix U = new Matrix(n, n);
-                Matrix b = new Matrix(n, 1);
-                Console.WriteLine("\nEnter b Elem:");
-                b.InputElem();
-                Matrix x = new Matrix(n, 1);
-
-                x = UU(A, U, 3, b);
-
-                Console.WriteLine("\nx :");
-                x.OutputMatrix();
-
-                Console.WriteLine("\nU :");
-                U.OutputMatrix();
-
-                double detA = 1;
-                for (int i = 0; i < n; i++)
+                throw new Exception("Error");
+            }
+            for (int i = 0; i < n; i++) {
+                if (!(Math.Abs(C[i,0]) > 0))
                 {
-                    detA *= U[i, i];
+                    throw new Exception("Error");
                 }
-                Console.WriteLine($"\ndet(A) = det(U)^2 = {Math.Pow(detA,2.0F)}");
-
-                Console.WriteLine("\nU^t * U :");
-                Matrix tmpU = U.Transpose() * U;
-                tmpU.OutputMatrix();
-
-                Console.WriteLine("\nA :");
-                A.OutputMatrix();
-
-                Console.WriteLine("\nA * x :");
-                Matrix tmp = A * x;
-                tmp.OutputMatrix();
-
-                Console.WriteLine("\nb :");
-                b.OutputMatrix();
-
-                Console.ReadKey();
+                if(i < n-1)
+                {
+                    if (!(Math.Abs(A[i, 0]) >= 0))
+                    {
+                        throw new Exception("Error");
+                    }
+                    if (!(Math.Abs(B[i, 0]) >= 0))
+                    {
+                        throw new Exception("Error");
+                    }
+                }
+                if (i >= 1 && i < n-1)
+                {
+                    if (!(Math.Abs(C[i, 0]) >= (Math.Abs(A[i, 0])+ Math.Abs(B[i, 0]))))
+                    {
+                        throw new Exception("Error");
+                    }
+                }
+                
             }
-            else
+            if (!(Math.Abs(C[n - 1, 0]) >= Math.Abs(B[n - 2, 0])))
             {
-                throw new Exception("Matrix not symmetric");
+                throw new Exception("Error");
             }
 
+          
+
+            Console.Write("\nB :");
+            B.OutputVector();
+            Console.Write("\nC :");
+            C.OutputVector();
+            Console.Write("\nA :");
+            A.OutputVector();
+            Console.Write("\nF :");
+            F.OutputVector();
+
+            Matrix D = new Matrix(n, n);
+            for (int i = 0; i < n; i++)
+            {
+                D[i, i] = C[i,0];
+                if(i < n - 1)
+                {
+                    D[i, i+1] = B[i, 0];
+                    D[i+1, i] = A[i, 0];
+                }
+            }
+
+
+
+            Matrix y = TMA(A, B, C, F, n);
+            Console.Write("\nY :");
+            y.OutputVector();
+            Norma(y, n);
+
+
+            Matrix tmpU = D * y;
+            Console.Write("\nDy = ");
+            tmpU.OutputVector();
 
             Console.ReadKey();
 
