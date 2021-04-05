@@ -467,7 +467,10 @@ namespace CMLA_1_Matrix_Gauss
             //{
             //    throw new Exception("Matrix not symmetric");
             //}
-            Console.WriteLine("Input n: ");
+
+
+
+            Console.WriteLine("Input n+1: ");
             int n = Int32.Parse(Console.ReadLine());
             Matrix A = new Matrix(n-1, 1);
             Matrix B = new Matrix(n-1, 1);
@@ -532,7 +535,6 @@ namespace CMLA_1_Matrix_Gauss
             {
                 throw new Exception("Error");
             }
-
             if (!(count > 0))
             {
                 throw new Exception("Error");
@@ -541,12 +543,16 @@ namespace CMLA_1_Matrix_Gauss
 
             Console.Write("\nB :");
             B.OutputVector();
+            Console.WriteLine();
             Console.Write("\nC :");
             C.OutputVector();
+            Console.WriteLine();
             Console.Write("\nA :");
             A.OutputVector();
+            Console.WriteLine();
             Console.Write("\nF :");
             F.OutputVector();
+            Console.WriteLine();
 
             Matrix D = new Matrix(n, n);
             for (int i = 0; i < n; i++)
@@ -559,13 +565,12 @@ namespace CMLA_1_Matrix_Gauss
                 }
             }
 
-
-
             Matrix y = TMA(A, B, C, F, n);
             Console.Write("\nY :");
             y.OutputVector();
+            Console.WriteLine();
             Norma(y, n);
-
+            Console.WriteLine();
 
             Matrix tmpU = D * y;
             Console.Write("\nDy = ");
