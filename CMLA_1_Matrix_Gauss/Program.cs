@@ -484,7 +484,12 @@ namespace CMLA_1_Matrix_Gauss
             //F.InputElem();
 
             FillAllVector(A, B, C, F, n);
-            if (!(Math.Abs(C[0, 0]) >= Math.Abs(B[0, 0])))
+            int count = 0;
+            if ((Math.Abs(C[0, 0]) > Math.Abs(B[0, 0])))
+            {
+                count++;
+            }
+            else if(!(Math.Abs(C[0, 0]) == Math.Abs(B[0, 0])))
             {
                 throw new Exception("Error");
             }
@@ -506,19 +511,33 @@ namespace CMLA_1_Matrix_Gauss
                 }
                 if (i >= 1 && i < n-1)
                 {
-                    if (!(Math.Abs(C[i, 0]) >= (Math.Abs(A[i, 0])+ Math.Abs(B[i, 0]))))
+                    if ((Math.Abs(C[i, 0]) > (Math.Abs(A[i, 0])+ Math.Abs(B[i, 0]))))
+                    {
+                        count++;
+                       
+                    }
+                    else if (!(Math.Abs(C[i, 0]) == (Math.Abs(A[i, 0]) + Math.Abs(B[i, 0]))))
                     {
                         throw new Exception("Error");
                     }
                 }
                 
             }
-            if (!(Math.Abs(C[n - 1, 0]) >= Math.Abs(B[n - 2, 0])))
+            if ((Math.Abs(C[n - 1, 0]) > Math.Abs(B[n - 2, 0])))
+            {
+                count++;
+             
+            }
+            else if (!(Math.Abs(C[n - 1, 0]) == Math.Abs(B[n - 2, 0])))
             {
                 throw new Exception("Error");
             }
 
-          
+            if (!(count > 0))
+            {
+                throw new Exception("Error");
+            }
+
 
             Console.Write("\nB :");
             B.OutputVector();
