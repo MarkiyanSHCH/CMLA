@@ -388,6 +388,50 @@ namespace CMLA_1_Matrix_Gauss
             Console.WriteLine($"\n||y - y*|| = {final.Max()}");
         }
 
+        static void Seidel(Matrix A, Matrix B, int n, int k)
+        {
+            double m;
+            double Sum;
+            Matrix XK = new Matrix(n,1);
+            Matrix XK1 = new Matrix(n,1);
+            int Iteration = 0;
+            double e = 0.0001;
+            do
+            {
+                m = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    Sum = 0;
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (j > i)
+                            Sum += A[i, j] * XK[j,0];
+                        else if (j < i)
+                            Sum += A[i, j] * XK1[j,0];
+                    }
+                    XK1[i,0] = (Sum - B[i,0])/(-A[i,i]);
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    if (Math.Abs(XK1[i,0] - XK[i,0]) > m)
+                        m = Math.Abs(XK1[i,0] - XK[i,0]);
+                    XK[i,0] = XK1[i,0];
+                }
+                Iteration++;
+            } while (m > e || Iteration > k);
+
+
+            Matrix Tmp = A * XK1;
+            double Max = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (Math.Abs(Tmp[i,0] - B[i,0]) > Max)
+                    Max = Math.Abs(Tmp[i, 0] - B[i, 0]);
+            }
+
+            Console.WriteLine($"\n||Ax^(k+1) - b||∞ = {Max}, Iteration(k+1) = {Iteration}");
+        }
+
 
         static void Main(string[] args)
         {
@@ -470,12 +514,12 @@ namespace CMLA_1_Matrix_Gauss
 
 
 
-            Console.WriteLine("Input n+1: ");
-            int n = Int32.Parse(Console.ReadLine());
-            Matrix A = new Matrix(n-1, 1);
-            Matrix B = new Matrix(n-1, 1);
-            Matrix C = new Matrix(n, 1);
-            Matrix F = new Matrix(n, 1);
+            //Console.WriteLine("Input n+1: ");
+            //int n = Int32.Parse(Console.ReadLine());
+            //Matrix A = new Matrix(n-1, 1);
+            //Matrix B = new Matrix(n-1, 1);
+            //Matrix C = new Matrix(n, 1);
+            //Matrix F = new Matrix(n, 1);
 
             //Console.WriteLine("\nB :");
             //B.InputElem();
@@ -486,100 +530,124 @@ namespace CMLA_1_Matrix_Gauss
             //Console.WriteLine("\nF :");
             //F.InputElem();
 
-            FillAllVector(A, B, C, F, n);
-            int count = 0;
-            if ((Math.Abs(C[0, 0]) > Math.Abs(B[0, 0])))
-            {
-                count++;
-            }
-            else if(!(Math.Abs(C[0, 0]) == Math.Abs(B[0, 0])))
-            {
-                throw new Exception("Error");
-            }
-            for (int i = 0; i < n; i++) {
-                if (!(Math.Abs(C[i,0]) > 0))
-                {
-                    throw new Exception("Error");
-                }
-                if(i < n-1)
-                {
-                    if (!(Math.Abs(A[i, 0]) >= 0))
-                    {
-                        throw new Exception("Error");
-                    }
-                    if (!(Math.Abs(B[i, 0]) >= 0))
-                    {
-                        throw new Exception("Error");
-                    }
-                }
-                if (i >= 1 && i < n-1)
-                {
-                    if ((Math.Abs(C[i, 0]) > (Math.Abs(A[i, 0])+ Math.Abs(B[i, 0]))))
-                    {
-                        count++;
-                       
-                    }
-                    else if (!(Math.Abs(C[i, 0]) == (Math.Abs(A[i, 0]) + Math.Abs(B[i, 0]))))
-                    {
-                        throw new Exception("Error");
-                    }
-                }
-                
-            }
-            if ((Math.Abs(C[n - 1, 0]) > Math.Abs(B[n - 2, 0])))
-            {
-                count++;
-             
-            }
-            else if (!(Math.Abs(C[n - 1, 0]) == Math.Abs(B[n - 2, 0])))
-            {
-                throw new Exception("Error");
-            }
-            if (!(count > 0))
-            {
-                throw new Exception("Error");
-            }
+            ////FillAllVector(A, B, C, F, n);
+            //int count = 0;
+            //if ((Math.Abs(C[0, 0]) > Math.Abs(B[0, 0])))
+            //{
+            //    count++;
+            //}
+            //else if(!(Math.Abs(C[0, 0]) == Math.Abs(B[0, 0])))
+            //{
+            //    throw new Exception("Error");
+            //}
+            //for (int i = 0; i < n; i++) {
+            //    if (!(Math.Abs(C[i,0]) > 0))
+            //    {
+            //        throw new Exception("Error");
+            //    }
+            //    if(i < n-1)
+            //    {
+            //        if (!(Math.Abs(A[i, 0]) >= 0))
+            //        {
+            //            throw new Exception("Error");
+            //        }
+            //        if (!(Math.Abs(B[i, 0]) >= 0))
+            //        {
+            //            throw new Exception("Error");
+            //        }
+            //    }
+            //    if (i >= 1 && i < n-1)
+            //    {
+            //        if ((Math.Abs(C[i, 0]) > (Math.Abs(A[i, 0])+ Math.Abs(B[i, 0]))))
+            //        {
+            //            count++;
+
+            //        }
+            //        else if (!(Math.Abs(C[i, 0]) == (Math.Abs(A[i, 0]) + Math.Abs(B[i, 0]))))
+            //        {
+            //            throw new Exception("Error");
+            //        }
+            //    }
+
+            //}
+            //if ((Math.Abs(C[n - 1, 0]) > Math.Abs(B[n - 2, 0])))
+            //{
+            //    count++;
+
+            //}
+            //else if (!(Math.Abs(C[n - 1, 0]) == Math.Abs(B[n - 2, 0])))
+            //{
+            //    throw new Exception("Error");
+            //}
+            //if (!(count > 0))
+            //{
+            //    throw new Exception("Error");
+            //}
 
 
-            Console.Write("\nB :");
-            B.OutputVector();
-            Console.WriteLine();
-            Console.Write("\nC :");
-            C.OutputVector();
-            Console.WriteLine();
-            Console.Write("\nA :");
-            A.OutputVector();
-            Console.WriteLine();
-            Console.Write("\nF :");
-            F.OutputVector();
-            Console.WriteLine();
+            //Console.Write("\nB :");
+            //B.OutputVector();
+            //Console.WriteLine();
+            //Console.Write("\nC :");
+            //C.OutputVector();
+            //Console.WriteLine();
+            //Console.Write("\nA :");
+            //A.OutputVector();
+            //Console.WriteLine();
+            //Console.Write("\nF :");
+            //F.OutputVector();
+            //Console.WriteLine();
 
-            Matrix D = new Matrix(n, n);
-            for (int i = 0; i < n; i++)
-            {
-                D[i, i] = C[i,0];
-                if(i < n - 1)
-                {
-                    D[i, i+1] = B[i, 0];
-                    D[i+1, i] = A[i, 0];
-                }
-            }
+            //Matrix D = new Matrix(n, n);
+            //for (int i = 0; i < n; i++)
+            //{
+            //    D[i, i] = C[i,0];
+            //    if(i < n - 1)
+            //    {
+            //        D[i, i+1] = B[i, 0];
+            //        D[i+1, i] = A[i, 0];
+            //    }
+            //}
 
-            Matrix y = TMA(A, B, C, F, n);
-            Console.Write("\nY :");
-            y.OutputVector();
-            Console.WriteLine();
-            Norma(y, n);
-            Console.WriteLine();
+            //Matrix y = TMA(A, B, C, F, n);
+            //Console.Write("\nY :");
+            //y.OutputVector();
+            //Console.WriteLine();
+            ////Norma(y, n);
+            //Console.WriteLine();
 
-            Matrix tmpU = D * y;
-            Console.Write("\nDy = ");
-            tmpU.OutputVector();
+            //Matrix tmpU = D * y;
+            //Console.Write("\nDy = ");
+            //tmpU.OutputVector();
+
+            //Console.ReadKey();
+
+
+            Console.WriteLine("Input n: ");
+            int n = Int32.Parse(Console.ReadLine());
+            Matrix A = new Matrix(n, n);
+            Matrix B = new Matrix(n, 1);
+            Console.WriteLine("\nA :");
+            A.InputElem();
+            Console.WriteLine("\nB :");
+            B.InputElem();
+
+            Console.WriteLine("\nInput k(max): ");
+            int k = Int32.Parse(Console.ReadLine());
+
+            Seidel(A, B, n,k);
 
             Console.ReadKey();
-
 
         }
     }
     
 }
+
+
+
+// B -1 -1 0
+// A 0 -1 -1
+// C 1 2 3 4
+// F -6 15 5 31
+// Y 4 10 5 9
