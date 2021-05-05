@@ -157,8 +157,14 @@ namespace CMLA_1_Matrix_Gauss
             });
             return result;
         }
+        public static Matrix operator *(Matrix matrix, double value)
+        {
+            var result = new Matrix(matrix.m, matrix.n);
+            result.ProcessFunctionOverData((i, j) =>
+                result[i, j] = matrix[i, j] * value);
+            return result;
+        }
 
-       
 
         private Matrix CreateMatrixWithoutRow(int row)
         {
@@ -432,6 +438,85 @@ namespace CMLA_1_Matrix_Gauss
             Console.WriteLine($"\n||Ax^(k+1) - b||∞ = {Max}, Iteration(k+1) = {Iteration}");
         }
 
+        static double ScalarProduct(Matrix a, Matrix b)
+        {
+            double res = 0;
+            for (int i = 0; i < a.m; i++)
+                res += a[i,0] * b[i,0];
+            return res;
+        }
+
+        static void SP(Matrix A, double lambda0, int n, Matrix y0)
+        {
+            double eps = 0.000001;
+            List<Matrix> x = new List<Matrix>();
+            List<Matrix> y = new List<Matrix>();
+            List<double> lambda = new List<double>();
+            List<double> s = new List<double>();
+            List<double> t = new List<double>();
+            int k = 0;
+            double m;
+            t.Add(0);
+            y.Add(y0);
+            lambda.Add(lambda0);
+            s.Add(ScalarProduct(y[0], y[0]));
+
+            Matrix tmpX = new Matrix(n, 1);
+            for (int i = 0; i < n; i++)
+            {
+                tmpX[i, 0] = y[0][i,0] / Math.Sqrt(s[0]);
+
+            }
+            x.Add(tmpX);
+
+
+            do
+            {
+                k++;
+                y.Add(UU(A,new Matrix(n,n),n,x[k-1]));
+                s.Add(ScalarProduct(y[k], y[k]));
+                t.Add(ScalarProduct(y[k], x[k - 1]));
+
+                lambda.Add(s[k] / t[k]);
+                Matrix tmp = new Matrix(n, 1);
+                for (int i = 0; i < n; i++)
+                {
+                    tmp[i, 0] = y[k][i, 0] / Math.Sqrt(s[k]);
+
+                }
+                x.Add(tmp);
+
+                m = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    double tmpMax = Math.Abs(x[k][i, 0] - x[k - 1][i, 0]);
+                    if (tmpMax > m)
+                        m = tmpMax;
+                }
+
+            } while (Math.Abs(lambda[k]-lambda[k-1])>eps && m > eps);
+
+            double lambdaN = 1 / lambda[k];
+            Console.WriteLine($"\nIteration(k) = {k}, λ_1 = {lambdaN}");
+            Console.WriteLine("Vector x_1 :");
+            Console.Write("x_1 = ( ");
+            for (int i = 0; i < n; i++)
+            {
+                Console.Write($"{x[k][i,0]} ");
+
+            }
+            Console.Write($")^T\n");
+
+            Matrix AX = A * x[k];
+            Matrix LX = x[k] * lambdaN;
+
+            Console.WriteLine("\nA*x :");
+            AX.OutputMatrix();
+            Console.WriteLine("\nλ*x :");
+            LX.OutputMatrix();
+
+           
+        }
 
         static void Main(string[] args)
         {
@@ -623,20 +708,35 @@ namespace CMLA_1_Matrix_Gauss
             //Console.ReadKey();
 
 
+            //Console.WriteLine("Input n: ");
+            //int n = Int32.Parse(Console.ReadLine());
+            //Matrix A = new Matrix(n, n);
+            //Matrix B = new Matrix(n, 1);
+            //Console.WriteLine("\nA :");
+            //A.InputElem();
+            //Console.WriteLine("\nB :");
+            //B.InputElem();
+
+            //Console.WriteLine("\nInput k(max): ");
+            //int k = Int32.Parse(Console.ReadLine());
+
+            //Seidel(A, B, n,k);
+
+            //Console.ReadKey();
+
+
             Console.WriteLine("Input n: ");
             int n = Int32.Parse(Console.ReadLine());
             Matrix A = new Matrix(n, n);
-            Matrix B = new Matrix(n, 1);
+            Matrix y = new Matrix(n, 1);
             Console.WriteLine("\nA :");
             A.InputElem();
-            Console.WriteLine("\nB :");
-            B.InputElem();
+            Console.WriteLine("\ny :");
+            y.InputElem();
+            Console.WriteLine("\nInput lambda: ");
+            double lambda = double.Parse(Console.ReadLine());
 
-            Console.WriteLine("\nInput k(max): ");
-            int k = Int32.Parse(Console.ReadLine());
-
-            Seidel(A, B, n,k);
-
+            SP(A, lambda, n, y);
             Console.ReadKey();
 
         }
@@ -644,10 +744,3 @@ namespace CMLA_1_Matrix_Gauss
     
 }
 
-
-
-// B -1 -1 0
-// A 0 -1 -1
-// C 1 2 3 4
-// F -6 15 5 31
-// Y 4 10 5 9
